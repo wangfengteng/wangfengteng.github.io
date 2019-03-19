@@ -188,36 +188,32 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-kubernetes-admin-token" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-etcd-product" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/03/19/kubernetes-admin-token/">Kubernetes Dashboard用token登陆</a>
+      <a class="article-title" href="/2019/03/19/etcd-product/">Etcd 生产环境中注意配置</a>
     </h1>
   
 
         
-        <a href="/2019/03/19/kubernetes-admin-token/" class="archive-article-date">
-  	<time datetime="2019-03-19T09:07:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
+        <a href="/2019/03/19/etcd-product/" class="archive-article-date">
+  	<time datetime="2019-03-19T15:47:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>获取Kubernetes Cluster Admin Token，用来登陆Kubernetes Dashboard</p>
-<h1 id="创建服务账号"><a href="#创建服务账号" class="headerlink" title="创建服务账号"></a>创建服务账号</h1><p>首先创建一个叫admin-user的服务账号，并放在kube-system名称空间下：</p>
-<h2 id="admin-user-yaml"><a href="#admin-user-yaml" class="headerlink" title="admin-user.yaml"></a>admin-user.yaml</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: admin-user</span><br><span class="line">  namespace: kube-system</span><br></pre></td></tr></table></figure>
-<p>执行kubectl create命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f admin-user.yaml</span><br></pre></td></tr></table></figure></p>
-<h1 id="绑定角色"><a href="#绑定角色" class="headerlink" title="绑定角色"></a>绑定角色</h1><p>默认情况下，kubeadm创建集群时已经创建了admin角色，我们直接绑定即可：</p>
-<h2 id="admin-user-role-binding-yaml"><a href="#admin-user-role-binding-yaml" class="headerlink" title="admin-user-role-binding.yaml"></a>admin-user-role-binding.yaml</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: rbac.authorization.k8s.io/v1beta1</span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">metadata:</span><br><span class="line">  name: admin-user</span><br><span class="line">roleRef:</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: cluster-admin</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: admin-user</span><br><span class="line">  namespace: kube-system</span><br></pre></td></tr></table></figure>
-<p>执行kubectl create命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f  admin-user-role-binding.yaml</span><br></pre></td></tr></table></figure></p>
-<h1 id="获取Token"><a href="#获取Token" class="headerlink" title="获取Token"></a>获取Token</h1><p>现在我们需要找到新创建的用户的Token，以便用来登录dashboard：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk <span class="string">'&#123;print $1&#125;'</span>)</span><br></pre></td></tr></table></figure></p>
-<p>输出类似：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">Name:         admin-user-token-vhmxf</span><br><span class="line">Namespace:    kube-system</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  kubernetes.io/service-account.name: admin-user</span><br><span class="line">              kubernetes.io/service-account.uid: 377eec33-4953-11e9-9fb2-fa163e7cc358</span><br><span class="line"></span><br><span class="line">Type:  kubernetes.io/service-account-token</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">ca.crt:     1029 bytes</span><br><span class="line">namespace:  11 bytes</span><br><span class="line">token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXZobXhmIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIzNzdlZWMzMy00OTUzLTExZTktOWZiMi1mYTE2M2U3Y2MzNTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.Hnss7RxkfPBS8iSduJ0FM9sGSLlZzonLIQrNEbuAKTtiq9kDTJF4kVdBMx3_c1Oja9RRjOQ0dy8tDRk5M7hsLv1qjU9OCX2bqsXcwI3yWhQnjoFBUB_LNsJtz6GXOblr5hG2w3ixPAXFzByT863-MtFRM8gVEhu2P2nVqUeoucYG7YtPk3JHGpKQkySJLSmg6F9INpb6y7CXY9jj-kuDzi4FAtWm3Lxe3biR3ZEBJ-v2xiiatXYRNLhbnwybtBVTu2hna1H01jDntC7T7sf7HgXQ_5hVa4bTLEWE1JG5_5U1gwZDg7pp_jFhZzRa6gKujy0SnImrnte4pLg_qp0G_w</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Name:         istio.admin-user</span><br><span class="line">Namespace:    kube-system</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  istio.io/service-account.name: admin-user</span><br><span class="line"></span><br><span class="line">Type:  istio.io/key-and-cert</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">cert-chain.pem:  1168 bytes</span><br><span class="line">key.pem:         1679 bytes</span><br><span class="line">root-cert.pem:   1066 bytes</span><br></pre></td></tr></table></figure></p>
-<p>然后把Token复制到登录界面的Token输入框中，登入即可</p>
+        <p>最近生产环境中压力测试Kubernetes，500节点压力测试<br>Etcd的版本是3.2.9<br>之后发现etcd集群之间的数据同步太慢，Kubernetes的ApiServer基本无响应<br>所以升级Etcd到3.3.11 修改了以下配置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--auto-compaction-retention</span><br></pre></td></tr></table></figure></p>
+<p>由于ETCD数据存储多版本数据，随着写入的主键增加历史版本需要定时清理，　默认的历史数据是不会清理的，数据达到2G就不能写入，必须要清理压缩历史数据才能继续写入；<br>所以根据业务需求，在上生产环境之前就提前确定，历史数据多长时间压缩一次；　我们的生产环境现在升级后是默认一小时压缩一次数据。这样可以极大的保证集群稳定，减少内存和磁盘占用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--max-request-bytes</span><br></pre></td></tr></table></figure>
+<p>etcd Raft消息最大字节数，ETCD默认该值为1.5M; 但是很多业务场景发现同步数据的时候1.5M完全没法满足要求，所以提前确定初始值很重要；　由于1.5M导致我们线上的业务无法写入元数据的问题，<br>我们紧急升级之后把该值修改为默认32M,但是官方推荐的是10M，大家可以根据业务情况自己调整</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--quota-backend-bytes</span><br></pre></td></tr></table></figure>
+<p>ETCDdb数据大小，默认是２G,当数据达到２G的时候就不允许写入，必须对历史数据进行压缩才能继续写入；　参加1里面说的，我们启动的时候就应该提前确定大小，官方推荐是8G,这里我们也使用8G的配置</p>
 
       
 
@@ -231,7 +227,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">kubernetes</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">etcd</a>
         		</li>
       		
 		</ul>
@@ -241,7 +237,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/03/19/kubernetes-admin-token/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/03/19/etcd-product/">展开全文 >></a>
         </p>
       
 
@@ -318,6 +314,89 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/03/19/hello-world/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-kubernetes-admin-token" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/19/kubernetes-admin-token/">Kubernetes Dashboard用token登陆</a>
+    </h1>
+  
+
+        
+        <a href="/2019/03/19/kubernetes-admin-token/" class="archive-article-date">
+  	<time datetime="2019-03-19T09:07:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>获取Kubernetes Cluster Admin Token，用来登陆Kubernetes Dashboard</p>
+<h1 id="创建服务账号"><a href="#创建服务账号" class="headerlink" title="创建服务账号"></a>创建服务账号</h1><p>首先创建一个叫admin-user的服务账号，并放在kube-system名称空间下：</p>
+<h2 id="admin-user-yaml"><a href="#admin-user-yaml" class="headerlink" title="admin-user.yaml"></a>admin-user.yaml</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: admin-user</span><br><span class="line">  namespace: kube-system</span><br></pre></td></tr></table></figure>
+<p>执行kubectl create命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f admin-user.yaml</span><br></pre></td></tr></table></figure></p>
+<h1 id="绑定角色"><a href="#绑定角色" class="headerlink" title="绑定角色"></a>绑定角色</h1><p>默认情况下，kubeadm创建集群时已经创建了admin角色，我们直接绑定即可：</p>
+<h2 id="admin-user-role-binding-yaml"><a href="#admin-user-role-binding-yaml" class="headerlink" title="admin-user-role-binding.yaml"></a>admin-user-role-binding.yaml</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: rbac.authorization.k8s.io/v1beta1</span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">metadata:</span><br><span class="line">  name: admin-user</span><br><span class="line">roleRef:</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: cluster-admin</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: admin-user</span><br><span class="line">  namespace: kube-system</span><br></pre></td></tr></table></figure>
+<p>执行kubectl create命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f  admin-user-role-binding.yaml</span><br></pre></td></tr></table></figure></p>
+<h1 id="获取Token"><a href="#获取Token" class="headerlink" title="获取Token"></a>获取Token</h1><p>现在我们需要找到新创建的用户的Token，以便用来登录dashboard：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk <span class="string">'&#123;print $1&#125;'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>输出类似：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">Name:         admin-user-token-vhmxf</span><br><span class="line">Namespace:    kube-system</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  kubernetes.io/service-account.name: admin-user</span><br><span class="line">              kubernetes.io/service-account.uid: 377eec33-4953-11e9-9fb2-fa163e7cc358</span><br><span class="line"></span><br><span class="line">Type:  kubernetes.io/service-account-token</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">ca.crt:     1029 bytes</span><br><span class="line">namespace:  11 bytes</span><br><span class="line">token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXZobXhmIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIzNzdlZWMzMy00OTUzLTExZTktOWZiMi1mYTE2M2U3Y2MzNTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.Hnss7RxkfPBS8iSduJ0FM9sGSLlZzonLIQrNEbuAKTtiq9kDTJF4kVdBMx3_c1Oja9RRjOQ0dy8tDRk5M7hsLv1qjU9OCX2bqsXcwI3yWhQnjoFBUB_LNsJtz6GXOblr5hG2w3ixPAXFzByT863-MtFRM8gVEhu2P2nVqUeoucYG7YtPk3JHGpKQkySJLSmg6F9INpb6y7CXY9jj-kuDzi4FAtWm3Lxe3biR3ZEBJ-v2xiiatXYRNLhbnwybtBVTu2hna1H01jDntC7T7sf7HgXQ_5hVa4bTLEWE1JG5_5U1gwZDg7pp_jFhZzRa6gKujy0SnImrnte4pLg_qp0G_w</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Name:         istio.admin-user</span><br><span class="line">Namespace:    kube-system</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  istio.io/service-account.name: admin-user</span><br><span class="line"></span><br><span class="line">Type:  istio.io/key-and-cert</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">cert-chain.pem:  1168 bytes</span><br><span class="line">key.pem:         1679 bytes</span><br><span class="line">root-cert.pem:   1066 bytes</span><br></pre></td></tr></table></figure></p>
+<p>然后把Token复制到登录界面的Token输入框中，登入即可</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">kubernetes</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/03/19/kubernetes-admin-token/">展开全文 >></a>
         </p>
       
 
@@ -450,11 +529,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">kubernetes</a>
+                <a href="javascript:void(0)" class="js-tag color5">etcd</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">nothing</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">kubernetes</a>
               </li>
             
             <div class="clearfix"></div>

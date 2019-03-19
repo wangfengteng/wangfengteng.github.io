@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://alishell.club">
-  <title>Archives | 钢弹刚硬</title>
+  <title>Etcd 生产环境中注意配置 | 钢弹刚硬</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="钢弹刚硬">
-<meta property="og:url" content="http://alishell.club/archives/index.html">
+  <meta name="description" content="最近生产环境中压力测试Kubernetes，500节点压力测试Etcd的版本是3.2.9之后发现etcd集群之间的数据同步太慢，Kubernetes的ApiServer基本无响应所以升级Etcd到3.3.11 修改了以下配置1--auto-compaction-retention 由于ETCD数据存储多版本数据，随着写入的主键增加历史版本需要定时清理，　默认的历史数据是不会清理的，数据达到2G就不">
+<meta name="keywords" content="etcd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Etcd 生产环境中注意配置">
+<meta property="og:url" content="http://alishell.club/2019/03/19/etcd-product/index.html">
 <meta property="og:site_name" content="钢弹刚硬">
+<meta property="og:description" content="最近生产环境中压力测试Kubernetes，500节点压力测试Etcd的版本是3.2.9之后发现etcd集群之间的数据同步太慢，Kubernetes的ApiServer基本无响应所以升级Etcd到3.3.11 修改了以下配置1--auto-compaction-retention 由于ETCD数据存储多版本数据，随着写入的主键增加历史版本需要定时清理，　默认的历史数据是不会清理的，数据达到2G就不">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-19T15:51:45.876Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="钢弹刚硬">
+<meta name="twitter:title" content="Etcd 生产环境中注意配置">
+<meta name="twitter:description" content="最近生产环境中压力测试Kubernetes，500节点压力测试Etcd的版本是3.2.9之后发现etcd集群之间的数据同步太慢，Kubernetes的ApiServer基本无响应所以升级Etcd到3.3.11 修改了以下配置1--auto-compaction-retention 由于ETCD数据存储多版本数据，随着写入的主键增加历史版本需要定时清理，　默认的历史数据是不会清理的，数据达到2G就不">
   
     <link rel="alternative" href="/atom.xml" title="钢弹刚硬" type="application/atom+xml">
   
@@ -186,36 +191,66 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-etcd-product" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/19/etcd-product/" class="archive-article-date">
-  	<time datetime="2019-03-19T15:47:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/03/19/etcd-product/">Etcd 生产环境中注意配置</a>
+    <h1 class="article-title" itemprop="name">
+      Etcd 生产环境中注意配置
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2019/03/19/etcd-product/" class="archive-article-date">
+  	<time datetime="2019-03-19T15:47:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近生产环境中压力测试Kubernetes，500节点压力测试<br>Etcd的版本是3.2.9<br>之后发现etcd集群之间的数据同步太慢，Kubernetes的ApiServer基本无响应<br>所以升级Etcd到3.3.11 修改了以下配置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--auto-compaction-retention</span><br></pre></td></tr></table></figure></p>
+<p>由于ETCD数据存储多版本数据，随着写入的主键增加历史版本需要定时清理，　默认的历史数据是不会清理的，数据达到2G就不能写入，必须要清理压缩历史数据才能继续写入；<br>所以根据业务需求，在上生产环境之前就提前确定，历史数据多长时间压缩一次；　我们的生产环境现在升级后是默认一小时压缩一次数据。这样可以极大的保证集群稳定，减少内存和磁盘占用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--max-request-bytes</span><br></pre></td></tr></table></figure>
+<p>etcd Raft消息最大字节数，ETCD默认该值为1.5M; 但是很多业务场景发现同步数据的时候1.5M完全没法满足要求，所以提前确定初始值很重要；　由于1.5M导致我们线上的业务无法写入元数据的问题，<br>我们紧急升级之后把该值修改为默认32M,但是官方推荐的是10M，大家可以根据业务情况自己调整</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--quota-backend-bytes</span><br></pre></td></tr></table></figure>
+<p>ETCDdb数据大小，默认是２G,当数据达到２G的时候就不允许写入，必须对历史数据进行压缩才能继续写入；　参加1里面说的，我们启动的时候就应该提前确定大小，官方推荐是8G,这里我们也使用8G的配置</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>3 克 油<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="../../../../wechat.jpeg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -227,95 +262,107 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="https://img.fanhaobai.com/qrcode.php?url=https://alishell.club" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/19/hello-world/" class="archive-article-date">
-  	<time datetime="2019-03-19T09:07:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2019/03/19/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">人生浓缩的三句话</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/03/19/hello-world/">人生浓缩的三句话</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">nothing</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/19/kubernetes-admin-token/" class="archive-article-date">
-  	<time datetime="2019-03-19T09:07:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/03/19/kubernetes-admin-token/">Kubernetes Dashboard用token登陆</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">kubernetes</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
 
 
           </div>
@@ -348,8 +395,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
