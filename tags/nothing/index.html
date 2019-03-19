@@ -6,20 +6,15 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>kubernetes-admin-token | 钢弹刚硬</title>
+  <title>Tag: nothing | 钢弹刚硬</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="获取Kubernetes Cluster Admin Token，用来登陆Kubernetes Dashboard #创建服务账号首先创建一个叫admin-user的服务账号，并放在kube-system名称空间下： admin-user.yaml12345apiVersion: v1kind: ServiceAccountmetadata:  name: admin-user  namespac">
-<meta name="keywords" content="kubernetes">
-<meta property="og:type" content="article">
-<meta property="og:title" content="kubernetes-admin-token">
-<meta property="og:url" content="http://yoursite.com/2019/03/19/kubernetes-admin-token/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="钢弹刚硬">
+<meta property="og:url" content="http://yoursite.com/tags/nothing/index.html">
 <meta property="og:site_name" content="钢弹刚硬">
-<meta property="og:description" content="获取Kubernetes Cluster Admin Token，用来登陆Kubernetes Dashboard #创建服务账号首先创建一个叫admin-user的服务账号，并放在kube-system名称空间下： admin-user.yaml12345apiVersion: v1kind: ServiceAccountmetadata:  name: admin-user  namespac">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-19T10:04:40.732Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="kubernetes-admin-token">
-<meta name="twitter:description" content="获取Kubernetes Cluster Admin Token，用来登陆Kubernetes Dashboard #创建服务账号首先创建一个叫admin-user的服务账号，并放在kube-system名称空间下： admin-user.yaml12345apiVersion: v1kind: ServiceAccountmetadata:  name: admin-user  namespac">
+<meta name="twitter:title" content="钢弹刚硬">
   
     <link rel="alternative" href="/atom.xml" title="钢弹刚硬" type="application/atom+xml">
   
@@ -191,186 +186,60 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-kubernetes-admin-token" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      kubernetes-admin-token
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2019" class="archive-year">2019</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2019/03/19/hello-world/" class="archive-article-date">
+  	<time datetime="2019-03-19T09:07:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2019/03/19/hello-world/">人生浓缩的三句话</a>
     </h1>
   
 
-        
-        <a href="/2019/03/19/kubernetes-admin-token/" class="archive-article-date">
-  	<time datetime="2019-03-19T09:07:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>获取Kubernetes Cluster Admin Token，用来登陆Kubernetes Dashboard</p>
-<p>#创建服务账号<br>首先创建一个叫admin-user的服务账号，并放在kube-system名称空间下：</p>
-<h2 id="admin-user-yaml"><a href="#admin-user-yaml" class="headerlink" title="admin-user.yaml"></a>admin-user.yaml</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: admin-user</span><br><span class="line">  namespace: kube-system</span><br></pre></td></tr></table></figure>
-<p>执行kubectl create命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f admin-user.yaml</span><br></pre></td></tr></table></figure></p>
-<p>##绑定角色<br>默认情况下，kubeadm创建集群时已经创建了admin角色，我们直接绑定即可：</p>
-<h2 id="admin-user-role-binding-yaml"><a href="#admin-user-role-binding-yaml" class="headerlink" title="admin-user-role-binding.yaml"></a>admin-user-role-binding.yaml</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: rbac.authorization.k8s.io/v1beta1</span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">metadata:</span><br><span class="line">  name: admin-user</span><br><span class="line">roleRef:</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: cluster-admin</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: admin-user</span><br><span class="line">  namespace: kube-system</span><br></pre></td></tr></table></figure>
-<p>执行kubectl create命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f  admin-user-role-binding.yaml</span><br></pre></td></tr></table></figure></p>
-<p>#获取Token<br>现在我们需要找到新创建的用户的Token，以便用来登录dashboard：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk <span class="string">'&#123;print $1&#125;'</span>)</span><br></pre></td></tr></table></figure></p>
-<p>输出类似：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">Name:         admin-user-token-vhmxf</span><br><span class="line">Namespace:    kube-system</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  kubernetes.io/service-account.name: admin-user</span><br><span class="line">              kubernetes.io/service-account.uid: 377eec33-4953-11e9-9fb2-fa163e7cc358</span><br><span class="line"></span><br><span class="line">Type:  kubernetes.io/service-account-token</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">ca.crt:     1029 bytes</span><br><span class="line">namespace:  11 bytes</span><br><span class="line">token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXZobXhmIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIzNzdlZWMzMy00OTUzLTExZTktOWZiMi1mYTE2M2U3Y2MzNTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.Hnss7RxkfPBS8iSduJ0FM9sGSLlZzonLIQrNEbuAKTtiq9kDTJF4kVdBMx3_c1Oja9RRjOQ0dy8tDRk5M7hsLv1qjU9OCX2bqsXcwI3yWhQnjoFBUB_LNsJtz6GXOblr5hG2w3ixPAXFzByT863-MtFRM8gVEhu2P2nVqUeoucYG7YtPk3JHGpKQkySJLSmg6F9INpb6y7CXY9jj-kuDzi4FAtWm3Lxe3biR3ZEBJ-v2xiiatXYRNLhbnwybtBVTu2hna1H01jDntC7T7sf7HgXQ_5hVa4bTLEWE1JG5_5U1gwZDg7pp_jFhZzRa6gKujy0SnImrnte4pLg_qp0G_w</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Name:         istio.admin-user</span><br><span class="line">Namespace:    kube-system</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  istio.io/service-account.name: admin-user</span><br><span class="line"></span><br><span class="line">Type:  istio.io/key-and-cert</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">cert-chain.pem:  1168 bytes</span><br><span class="line">key.pem:         1679 bytes</span><br><span class="line">root-cert.pem:   1066 bytes</span><br></pre></td></tr></table></figure></p>
-<p>然后把Token复制到登录界面的Token输入框中，登入即可</p>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>3 克 油<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="../../../../wechat.jpeg">
-                      <span class="reward-type">微信</span>
-                    </div>
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">kubernetes</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">nothing</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="http://qr.liantu.com/api.php?text=http://yoursite.com/2019/03/19/kubernetes-admin-token/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2019/03/19/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          人生浓缩的三句话
-        
-      </div>
-    </a>
   
   
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
-
-  
+    
 
 
           </div>
@@ -393,9 +262,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
