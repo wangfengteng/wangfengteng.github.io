@@ -188,6 +188,86 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-openshift-add-dns" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/20/openshift-add-dns/">openshift 添加静态路由解析</a>
+    </h1>
+  
+
+        
+        <a href="/2019/03/20/openshift-add-dns/" class="archive-article-date">
+  	<time datetime="2019-03-20T15:44:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本地搭建了openshift v3.9.0的origin的测试环境，想要访问openshift router，由于目前不能在公司的DNS添加解析，采用以下两种访问方式</p>
+<h2 id="添加hosts文件"><a href="#添加hosts文件" class="headerlink" title="添加hosts文件"></a>添加hosts文件</h2><p>修改/etc/hosts配置<br>根据自己的实际情况配置，整合之前配置的静态域名解析</p>
+<h2 id="配置DNSMASQ"><a href="#配置DNSMASQ" class="headerlink" title="配置DNSMASQ"></a>配置DNSMASQ</h2><p>创建文件/etc/dnsmasq.d/openshift-cluster.conf，内容如下：<br>10.10.10.10 是我Openshift Master的ip</p>
+<p>local=/mydomain.local/<br>address=/.mydomain.local/10.10.10.10</p>
+<p>重新启动dnsmasq服务<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart dnsmasq</span><br></pre></td></tr></table></figure></p>
+<p>配置防火墙<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iptables -A IN_public_allow -p tcp -m tcp --dport 53 -m conntrack --ctstate NEW -j ACCEPT</span><br><span class="line">iptables -A IN_public_allow -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT</span><br></pre></td></tr></table></figure></p>
+<p>最后在本地电脑配置DNS的IP 10.10.10.10即可</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">openshift</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/03/20/openshift-add-dns/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-docker-oci-runc" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -697,11 +777,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">golang</a>
+                <a href="javascript:void(0)" class="js-tag color5">etcd</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">etcd</a>
+                <a href="javascript:void(0)" class="js-tag color2">golang</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -710,6 +790,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">nothing</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">openshift</a>
               </li>
             
             <div class="clearfix"></div>
